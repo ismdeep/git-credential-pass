@@ -261,8 +261,7 @@ func parseSecret(secret string) map[string]string {
 }
 
 func isPassNotFoundError(err error, output []byte) bool {
-	var exitErr *exec.ExitError
-	if !errors.As(err, &exitErr) {
+	if _, ok := errors.AsType[*exec.ExitError](err); !ok {
 		return false
 	}
 	s := strings.ToLower(string(output))
