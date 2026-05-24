@@ -87,10 +87,10 @@ func writeGetResult(request, stored map[string]string, w io.Writer) {
 	password := firstNonEmpty(stored["password"], request["password"])
 
 	if username != "" {
-		fmt.Fprintf(w, "username=%s\n", username)
+		_, _ = fmt.Fprintf(w, "username=%s\n", username)
 	}
 	if password != "" {
-		fmt.Fprintf(w, "password=%s\n", password)
+		_, _ = fmt.Fprintf(w, "password=%s\n", password)
 	}
 }
 
@@ -155,7 +155,7 @@ func passShow(entry string) (string, bool, error) {
 	cmd := newPassCmd("show", entry)
 	tty := attachTTYInput(cmd)
 	if tty != nil {
-		defer tty.Close()
+		defer func() { _ = tty.Close() }()
 	}
 	out, err := cmd.CombinedOutput()
 	if err == nil {
@@ -211,7 +211,7 @@ func passErase(entry string) error {
 	cmd := newPassCmd("rm", "-f", entry)
 	tty := attachTTYInput(cmd)
 	if tty != nil {
-		defer tty.Close()
+		defer func() { _ = tty.Close() }()
 	}
 	out, err := cmd.CombinedOutput()
 	if err == nil {
@@ -242,7 +242,7 @@ func formatSecret(cred map[string]string) string {
 	}
 	sort.Strings(keys)
 	for _, k := range keys {
-		fmt.Fprintf(&buf, "%s=%s\n", k, fields[k])
+		_, _ = fmt.Fprintf(&buf, "%s=%s\n", k, fields[k])
 	}
 	return buf.String()
 }
@@ -288,7 +288,7 @@ func firstNonEmpty(values ...string) string {
 }
 
 func fatalf(format string, args ...any) {
-	fmt.Fprintf(os.Stderr, format+"\n", args...)
+	_, _ = fmt.Fprintf(os.Stderr, format+"\n", args...)
 	os.Exit(1)
 }
 
@@ -335,7 +335,7 @@ func updateGPGStartupTTY(env []string) {
 	cmd.Env = env
 	tty := attachTTYInput(cmd)
 	if tty != nil {
-		defer tty.Close()
+		defer func() { _ = tty.Close() }()
 	}
 	_, _ = cmd.CombinedOutput()
 }
@@ -354,6 +354,6 @@ func logDebug(args []string, stdinRaw []byte) {
 		return
 	}
 
-	fmt.Fprintf(os.Stderr, "git-credential-pass debug: args=%q\n", args)
-	fmt.Fprintf(os.Stderr, "git-credential-pass debug: stdin:\n%s\n", string(stdinRaw))
+	_, _ = fmt.Fprintf(os.Stderr, "git-credential-pass debug: args=%q\n", args)
+	_, _ = fmt.Fprintf(os.Stderr, "git-credential-pass debug: stdin:\n%s\n", string(stdinRaw))
 }
