@@ -6,3 +6,6 @@
 
 # binary
 /git-credential-pass
+
+# build
+/build/
