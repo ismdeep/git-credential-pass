@@ -12,6 +12,7 @@ import (
 	"path"
 	"sort"
 	"strings"
+	"time"
 )
 
 func main() {
@@ -208,19 +209,9 @@ func credentialsEqual(existing, incoming map[string]string) bool {
 }
 
 func passErase(entry string) error {
-	cmd := newPassCmd("rm", "-f", entry)
-	tty := attachTTYInput(cmd)
-	if tty != nil {
-		defer func() { _ = tty.Close() }()
-	}
-	out, err := cmd.CombinedOutput()
-	if err == nil {
-		return nil
-	}
-	if isPassNotFoundError(err, out) {
-		return nil
-	}
-	return fmt.Errorf("%w: %s", err, strings.TrimSpace(string(out)))
+	_, _ = fmt.Fprintf(os.Stderr, "%v [ WARN ] git-credential-pass: skip run erase action. entry: %v\n",
+		time.Now().Format(time.RFC3339), entry)
+	return nil
 }
 
 func formatSecret(cred map[string]string) string {
